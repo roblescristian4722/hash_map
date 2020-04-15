@@ -17,9 +17,9 @@ int main ()
     map.insert("fornillo", 101.101);
     map.insert("La verdad me viene valiendo kk como la bes", 99);
     map.insert("La mera verdad me viene valiendo kaka pinche Andres Angeloid Humbertoide Alatawer no funca", 666.666);
+    /*
     map.delete_value("1");
     map.delete_value("pp");
-    /*
     map.deleteValue("1");
     map.deleteValue("33");
     map.deleteValue("23");
@@ -48,19 +48,15 @@ int main ()
     cout << *map["fornillo"] << endl;
     cout << *map["La verdad me viene valiendo kk como la bes"] << endl;
     cout << *map["La mera verdad me viene valiendo kaka pinche Andres Angeloid Humbertoide Alatawer no funca"] << endl;
+
+    cout << "-------------------------------------------------" << endl
+         << "Iterando..." << endl;
+    for (size_t i = 0; i < map.size(); ++i)
+        cout << *map.get_position(i) << endl;
     cout << "Tamaño: " << map.size() << endl;
     cout << "Haciendo clear()" << endl;
     map.clear();
     cout << "Tamaño: " << map.size() << endl;
-
-   /*
-    for (size_t i = 0; i < map.getBucket().size(); ++i){
-        cout << "hash: " << map.getBucket()[i].getHashValue() << endl;
-        for (size_t j = 0; j < map.getBucket()[i].getValues().size(); ++j){
-            cout << "   key: " << map.getBucket()[i].getValues()[j].getKey() << " | value: " << *map.getBucket()[i].getValues()[j].getValue() << endl;
-        }
-    }
-    */
 
     return 0;
 }

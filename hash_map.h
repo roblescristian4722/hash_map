@@ -60,18 +60,18 @@ class Bucket
 {
 private:
     size_t m_hashValue;
-    LSL<Node<K, V>> m_values;
+    LSL<Node<K, V>> m_nodes;
 
 public:
     Bucket() {}
     ~Bucket()
-    { m_values.clear(); }
+    { m_nodes.clear(); }
 
     size_t size_bucket()
-    { return m_values.size(); }
+    { return m_nodes.size(); }
 
     void append(const Node<K, V> &node)
-    { m_values.push_back(node); }
+    { m_nodes.push_back(node); }
 
     bool operator>(Bucket<K, V> &other)
     { return this->m_hashValue > other.m_hashValue; }
@@ -107,7 +107,7 @@ public:
     void delete_value(const K &keyVal);
     void clear();
     V *operator[](K index);
-    V *getPosition(size_t index);
+    V *get_position(size_t index);
     size_t hash_function(K val);
 };
 
@@ -160,7 +160,7 @@ void HashMap<K, V>::insert(const K &keyVal, const V &val)
     pos = is_colide(hash);
     if (pos != -1) {
         m_buckets[pos].append(n);
-        sort(m_buckets[pos].m_values);
+        sort(m_buckets[pos].m_nodes);
     }
 
     else {
@@ -181,7 +181,7 @@ void HashMap<K, V>::delete_value(const K &keyVal)
     long pos = is_colide(hash_function(keyVal));
 
     if (pos != -1){
-        auxList = &m_buckets[pos].m_values;
+        auxList = &m_buckets[pos].m_nodes;
 
         for (i = 0; i < auxList->size(); ++i)
             if ((*auxList)[i].key == keyVal) {
@@ -225,7 +225,7 @@ V *HashMap<K, V>::operator[](K index)
 
     nodeTmp.key = index;
     if (posBucket != -1) {
-        auxList = &m_buckets[posBucket].m_values;
+        auxList = &m_buckets[posBucket].m_nodes;
         posNode = binary_search(*auxList, nodeTmp);
         if (posNode != -1)
             v = &(*auxList)[posNode].value;
@@ -233,17 +233,23 @@ V *HashMap<K, V>::operator[](K index)
     return v;
 }
 
+// Gets a node from the hash map using a numeric index.
+// It's useful when iterating over every node in the hash map.
 template <typename K, typename V>
-V *HashMap<K, V>::getPosition(size_t index)
+V *HashMap<K, V>::get_position(size_t index)
 {
-    /*if (index >= size())
+    if (index >= size())
         cout << "error: index is grater or equal than size" << endl;
     else{
         for (size_t i = 0; i < m_buckets.size(); ++i){
-            //m_buckets[i]
+            for (size_t j = 0; j < m_buckets[i].m_nodes.size(); ++j){
+                if (!index)
+                    return &m_buckets[i].m_nodes[j].value;
+                --index;
+            }
         }
     }
-    */
+    return nullptr;
 }
 
 /////////////////////////
