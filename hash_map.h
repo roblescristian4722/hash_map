@@ -4,7 +4,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-#include "LSL.h"
+#include "lsl.h"
 #define DEFAULT_MOD 13
 using namespace std;
 

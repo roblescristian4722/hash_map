@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include "HashMap.h"
+#include "hash_map.h"
 
 using namespace std;
 
