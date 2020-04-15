@@ -7,7 +7,7 @@ using namespace std;
 int main ()
 {
     HashMap<string, float> map;
-    map.insert("1", 1.2);
+    map.insert("1", 1.5);
     map.insert("33", 22.1);
     map.insert("23", 33.3);
     map.insert("44", 44.1);
@@ -17,6 +17,7 @@ int main ()
     map.insert("fornillo", 101.101);
     map.insert("La verdad me viene valiendo kk como la bes", 99);
     map.insert("La mera verdad me viene valiendo kaka pinche Andres Angeloid Humbertoide Alatawer no funca", 666.666);
+    map.delete_value("1");
     map.delete_value("pp");
     /*
     map.deleteValue("1");
@@ -29,12 +30,17 @@ int main ()
     map.deleteValue("La verdad me viene valiendo kk como la bes");
     map.deleteValue("La mera verdad me viene valiendo kaka pinche Andres Angeloid Humbertoide Alatawer no funca");
     */
-    cout << *map["1"] << endl;
+
+    if (map["1"] == nullptr)
+        cout << "1 no existe" << endl;
+    else
+        cout << *map["1"] << endl;
+    *map["33"] = 33;
     cout << *map["33"] << endl;
     cout << *map["23"] << endl;
     cout << *map["44"] << endl;
     if (map["pp"] == nullptr)
-        cout << "no existe" << endl;
+        cout << "pp no existe" << endl;
     else
         cout << *map["pp"] << endl;
     cout << *map["kkkarla"] << endl;

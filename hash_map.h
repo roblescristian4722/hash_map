@@ -8,6 +8,14 @@
 #define DEFAULT_MOD 13
 using namespace std;
 
+//// CLASS PROTOTYPES ////
+template<typename K, typename V>
+class Node;
+template <typename K, typename V>
+class Bucket;
+template <typename K, typename V>
+class HashMap;
+
 /////////////////////////
 //// EXTRA FUNCTIONS ////
 /////////////////////////
@@ -31,23 +39,17 @@ public:
     Node(K _key, V _val) : key(_key), value(_val) {}
     ~Node() {}
 
-    void setKey(const K &val)
-    { key = val; }
-    void setValue(const V &val)
-    { value = val; }
-
-    K getKey() const
-    { return key; }
-    V *getValue()
-    { return &value; }
     bool operator>(Node<K, V> &other)
-    { return this->getKey() > other.getKey(); }
+    { return this->key > other.key; }
 
     bool operator==(Node<K, V> &other)
-    { return this->getKey() == other.getKey(); }
+    { return this->key == other.key; }
 
     bool operator<(Node<K, V> &other)
-    { return this->getKey() < other.getKey(); }
+    { return this->key < other.key; }
+
+    friend class Bucket<K,V>;
+    friend class HashMap<K, V>;
 };
 
 ////////////////
@@ -68,28 +70,19 @@ public:
     size_t size_bucket()
     { return m_values.size(); }
 
-    //funciones para la lista ligada
-    LSL<Node<K, V>> &getValues()
-    { return m_values; }
-
     void append(const Node<K, V> &node)
     { m_values.push_back(node); }
 
-    //funciones para el valor de hash
-    void setHashValue(size_t val)
-    { m_hashValue = val; }
-
-    size_t getHashValue() const
-    { return m_hashValue; }
-
     bool operator>(Bucket<K, V> &other)
-    { return this->getHashValue() > other.getHashValue(); }
+    { return this->m_hashValue > other.m_hashValue; }
 
     bool operator<(Bucket<K, V> &other)
-    { return this->getHashValue() < other.getHashValue(); }
+    { return this->m_hashValue < other.m_hashValue; }
 
     bool operator==(Bucket<K, V> &other)
-    { return this->getHashValue() == other.getHashValue(); }
+    { return this->m_hashValue == other.m_hashValue; }
+
+    friend class HashMap<K, V>;
 };
 //////////////////
 //// HASH MAP ////
@@ -114,6 +107,7 @@ public:
     void delete_value(const K &keyVal);
     void clear();
     V *operator[](K index);
+    V *getPosition(size_t index);
     size_t hash_function(K val);
 };
 
@@ -138,7 +132,7 @@ long HashMap<K, V>::is_colide(size_t hash)
         return -1;
 
     Bucket<K, V> bucketTmp;
-    bucketTmp.setHashValue(hash);
+    bucketTmp.m_hashValue = hash;
     return binary_search(m_buckets, bucketTmp);
 }
 
@@ -166,11 +160,11 @@ void HashMap<K, V>::insert(const K &keyVal, const V &val)
     pos = is_colide(hash);
     if (pos != -1) {
         m_buckets[pos].append(n);
-        sort(m_buckets[pos].getValues());
+        sort(m_buckets[pos].m_values);
     }
 
     else {
-        b.setHashValue(hash);
+        b.m_hashValue = hash;
         b.append(n);
         m_buckets.push_back(b);
         sort(m_buckets);
@@ -187,10 +181,10 @@ void HashMap<K, V>::delete_value(const K &keyVal)
     long pos = is_colide(hash_function(keyVal));
 
     if (pos != -1){
-        auxList = &m_buckets[pos].getValues();
+        auxList = &m_buckets[pos].m_values;
 
         for (i = 0; i < auxList->size(); ++i)
-            if ((*auxList)[i].getKey() == keyVal) {
+            if ((*auxList)[i].key == keyVal) {
                 auxList->erase(i);
                 break;
             }
@@ -201,7 +195,6 @@ void HashMap<K, V>::delete_value(const K &keyVal)
     }
     else
         cout << "There is not such value" << endl;
-    cout << m_buckets.size() << endl;
 }
 
 // Removes every value stored in the hash map
@@ -230,14 +223,27 @@ V *HashMap<K, V>::operator[](K index)
     long posBucket = is_colide(hashValue);
     V *v = nullptr;
 
-    nodeTmp.setKey(index);
+    nodeTmp.key = index;
     if (posBucket != -1) {
-        auxList = &m_buckets[posBucket].getValues();
+        auxList = &m_buckets[posBucket].m_values;
         posNode = binary_search(*auxList, nodeTmp);
         if (posNode != -1)
-            v = (*auxList)[posNode].getValue();
+            v = &(*auxList)[posNode].value;
     }
     return v;
+}
+
+template <typename K, typename V>
+V *HashMap<K, V>::getPosition(size_t index)
+{
+    /*if (index >= size())
+        cout << "error: index is grater or equal than size" << endl;
+    else{
+        for (size_t i = 0; i < m_buckets.size(); ++i){
+            //m_buckets[i]
+        }
+    }
+    */
 }
 
 /////////////////////////
