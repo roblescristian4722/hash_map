@@ -51,8 +51,11 @@ int main ()
 
     cout << "-------------------------------------------------" << endl
          << "Iterando..." << endl;
-    for (size_t i = 0; i < map.size(); ++i)
-        cout << *map.get_position(i) << endl;
+    HashMap<string, float>::Pair par;
+    for (size_t i = 0; i < map.size(); ++i){
+        par =  map.get_position(i);
+        cout << *par.key << " | " << *par.value << endl;
+    }
     cout << "Tamaño: " << map.size() << endl;
     cout << "Haciendo clear()" << endl;
     map.clear();

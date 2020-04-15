@@ -99,6 +99,12 @@ public:
     ~HashMap()
     { clear(); }
 
+    struct Pair
+    {
+        K *key;
+        V *value;
+    };
+
     bool is_empty();
     long is_colide(size_t hash);
     size_t size();
@@ -107,8 +113,8 @@ public:
     void delete_value(const K &keyVal);
     void clear();
     V *operator[](K index);
-    V *get_position(size_t index);
     size_t hash_function(K val);
+    HashMap::Pair get_position(size_t index);
 };
 
 //////////////////////
@@ -236,20 +242,27 @@ V *HashMap<K, V>::operator[](K index)
 // Gets a node from the hash map using a numeric index.
 // It's useful when iterating over every node in the hash map.
 template <typename K, typename V>
-V *HashMap<K, V>::get_position(size_t index)
+typename HashMap<K,V>::Pair HashMap<K, V>::get_position(size_t index)
 {
+    HashMap::Pair pair;
+    pair = {nullptr};
     if (index >= size())
         cout << "error: index is grater or equal than size" << endl;
     else{
         for (size_t i = 0; i < m_buckets.size(); ++i){
             for (size_t j = 0; j < m_buckets[i].m_nodes.size(); ++j){
-                if (!index)
-                    return &m_buckets[i].m_nodes[j].value;
+                if (!index){
+                    pair = {
+                        &m_buckets[i].m_nodes[j].key,
+                        &m_buckets[i].m_nodes[j].value
+                    };
+                    return pair;
+                }
                 --index;
             }
         }
     }
-    return nullptr;
+    return pair;
 }
 
 /////////////////////////
