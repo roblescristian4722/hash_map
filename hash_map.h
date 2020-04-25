@@ -52,15 +52,14 @@ template <typename K, typename V>
 class Bucket
 {
 private:
-    size_t m_hashValue;
     LSL<Node<K, V>> m_nodes;
-
+    bool m_visited;
 public:
     Bucket() {}
     ~Bucket()
     { m_nodes.clear(); }
 
-    size_t size_bucket()
+    size_t bucket_size()
     { return m_nodes.size(); }
 
     void append(const Node<K, V> &node)
@@ -98,7 +97,7 @@ public:
     };
 
     bool empty();
-    long colide(size_t hash);
+    bool colide(size_t hash);
     size_t size();
 
     void insert(const K &keyVal, const V &val);
@@ -135,14 +134,13 @@ bool HashMap<K, V>::empty()
 // by hash_function already exists and if it does this
 // method gives you it's exact position
 template <typename K, typename V>
-long HashMap<K, V>::colide(size_t hash)
+bool HashMap<K, V>::colide(size_t hash)
 {
     if (empty())
-        return -1;
-
-    Bucket<K, V> bucketTmp;
-    bucketTmp.m_hashValue = hash;
-    return binary_search(m_buckets, bucketTmp);
+        return false;
+    if (!m_buckets[hash].m_visited)
+        return false;
+    return true;
 }
 
 // Returns the total size of the hash map (i.e. the
@@ -151,8 +149,9 @@ template <typename K, typename V>
 size_t HashMap<K, V>::size()
 {
     size_t sizeTotal = 0;
-    for (size_t i = 0; i < m_buckets.size(); ++i)
-        sizeTotal += m_buckets[i].size_bucket();
+    for (size_t i = 0; i < PRIMO; ++i)
+        if (m_buckets[i].m_visited)
+            sizeTotal += m_buckets[i].bucket_size();
     return sizeTotal;
 }
 
@@ -162,22 +161,11 @@ void HashMap<K, V>::insert(const K &keyVal, const V &val)
 {
     Node<K, V> nodeTmp(keyVal, val);
     Bucket<K, V> bucketTmp;
-    long pos;
+    bool hashColided;
     size_t hash;
 
     hash = hash_function(keyVal);
-    pos = colide(hash);
-    if (pos != -1) {
-        m_buckets[pos].append(nodeTmp);
-        sort(m_buckets[pos].m_nodes);
-    }
-
-    else {
-        bucketTmp.m_hashValue = hash;
-        bucketTmp.append(nodeTmp);
-        m_buckets.push_back(bucketTmp);
-        sort(m_buckets);
-    }
+    m_buckets[hash].m_nodes.append(nodeTmp);
 }
 
 // Deletes an existing value in the hash map
@@ -257,32 +245,6 @@ V *HashMap<K, V>::operator[](K index)
             v = &(*auxList)[posNode].value;
     }
     return v;
-}
-
-// Gets a node from the hash map using a numeric index.
-// It's useful when iterating over every node in the hash map.
-template <typename K, typename V>
-typename HashMap<K,V>::Pair HashMap<K, V>::get_position(size_t index)
-{
-    HashMap::Pair pair;
-    pair = {nullptr};
-    if (index >= size())
-        cout << "error: index is grater or equal than size" << endl;
-    else{
-        for (size_t i = 0; i < m_buckets.size(); ++i){
-            for (size_t j = 0; j < m_buckets[i].m_nodes.size(); ++j){
-                if (!index){
-                    pair = {
-                        &m_buckets[i].m_nodes[j].key,
-                        &m_buckets[i].m_nodes[j].value
-                    };
-                    return pair;
-                }
-                --index;
-            }
-        }
-    }
-    return pair;
 }
 
 #endif //HASHMAP_H
