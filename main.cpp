@@ -17,20 +17,20 @@ int main ()
     map.insert("fornillo", 101.101);
     map.insert("La verdad me viene valiendo kk como la bes", 99);
     map.insert("La mera verdad me viene valiendo kaka pinche Andres Angeloid Humbertoide Alatawer no funca", 666.666);
-    /*
     map.delete_value("1");
     map.delete_value("pp");
-    map.deleteValue("1");
-    map.deleteValue("33");
-    map.deleteValue("23");
-    map.deleteValue("44");
-    map.deleteValue("kkkarla");
-    map.deleteValue("chichistosa");
-    map.deleteValue("fornillo");
-    map.deleteValue("La verdad me viene valiendo kk como la bes");
-    map.deleteValue("La mera verdad me viene valiendo kaka pinche Andres Angeloid Humbertoide Alatawer no funca");
+    /*
+    map.delete_value("33");
+    map.delete_value("1");
+    map.delete_value("23");
+    map.delete_value("44");
+    map.delete_value("kkkarla");
+    map.delete_value("chichistosa");
+    map.delete_value("fornillo");
+    map.delete_value("La verdad me viene valiendo kk como la bes");
+    map.delete_value("La mera verdad me viene valiendo kaka pinche Andres Angeloid Humbertoide Alatawer no funca");
     */
-
+   cout << "size: " << map.size() << endl;
     if (map["1"] == nullptr)
         cout << "1 no existe" << endl;
     else
@@ -49,13 +49,6 @@ int main ()
     cout << *map["La verdad me viene valiendo kk como la bes"] << endl;
     cout << *map["La mera verdad me viene valiendo kaka pinche Andres Angeloid Humbertoide Alatawer no funca"] << endl;
 
-    cout << "-------------------------------------------------" << endl
-         << "Iterando..." << endl;
-    HashMap<string, float>::Pair par;
-    for (size_t i = 0; i < map.size(); ++i){
-        par =  map.get_position(i);
-        cout << *par.key << " | " << *par.value << endl;
-    }
     cout << "Tamaño: " << map.size() << endl;
     cout << "Haciendo clear()" << endl;
     map.clear();

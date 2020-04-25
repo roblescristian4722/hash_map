@@ -9,6 +9,10 @@
 #define DEFAULT_MOD 13
 using namespace std;
 
+//// EXTRA METHOD DE CLARATION ////
+template <typename T>
+long binary_search(LSL<T> &list, T data);
+
 //// CLASS PROTOTYPES ////
 template<typename K, typename V>
 class Node;
@@ -61,9 +65,6 @@ public:
 
     size_t bucket_size()
     { return m_nodes.size(); }
-
-    void append(const Node<K, V> &node)
-    { m_nodes.push_back(node); }
 
     bool operator>(Bucket<K, V> &other)
     { return this->m_hashValue > other.m_hashValue; }
@@ -128,7 +129,7 @@ HashMap<K, V>::~HashMap()
 // and false otherwise
 template <typename K, typename V>
 bool HashMap<K, V>::empty()
-{ return m_size }
+{ return m_size; }
 
 // indicates wheter the hash value returned
 // by hash_function already exists and if it does this
@@ -160,12 +161,19 @@ template <typename K, typename V>
 void HashMap<K, V>::insert(const K &keyVal, const V &val)
 {
     Node<K, V> nodeTmp(keyVal, val);
-    Bucket<K, V> bucketTmp;
     bool hashColided;
     size_t hash;
 
+    // Hash value is calculated
     hash = hash_function(keyVal);
-    m_buckets[hash].m_nodes.append(nodeTmp);
+    // The node is inserted in it's corresponding position
+    // using the previously calculated hash value
+    m_buckets[hash].m_nodes.push_back(nodeTmp);
+    // The node list gets sorted
+    sort(m_buckets[hash].m_nodes);
+    m_buckets[hash].m_visited = true;
+    // The size counter increases by one
+    ++m_size;
 }
 
 // Deletes an existing value in the hash map
@@ -175,18 +183,21 @@ void HashMap<K, V>::delete_value(const K &keyVal)
     size_t aux = hash_function(keyVal);
     size_t i;
     LSL<Node<K, V>> *auxList;
-    long pos = colide(hash_function(keyVal));
+    long pos = hash_function(keyVal);
 
-    if (pos != -1){
+    if (m_buckets[pos].m_visited){
         auxList = &m_buckets[pos].m_nodes;
-
         for (i = 0; i < auxList->size(); ++i)
             if ((*auxList)[i].key == keyVal) {
                 auxList->erase(i);
+                // The size counter decreases
+                --m_size;
                 break;
             }
+        // If the node list is empty the "visited" flag
+        // turns into false again
         if (auxList->empty())
-            m_buckets.erase(pos);
+            m_buckets[pos].m_visited = false;
         else if (auxList->size() == i)
             cout << "There is not such value" << endl;
     }
@@ -197,7 +208,13 @@ void HashMap<K, V>::delete_value(const K &keyVal)
 // Removes every value stored in the hash map
 template <typename K, typename V>
 void HashMap<K, V>::clear()
-{ m_buckets.clear(); }
+{ 
+    for (long i = 0; i < PRIMO; ++i){
+        m_buckets[i].m_nodes.clear();
+        m_buckets[i].m_visited = false;
+    }
+    m_size = 0;
+}
 
 // It gets the key's corresponding hash
 // value using the PJW method
@@ -208,21 +225,22 @@ size_t HashMap<K, V>::hash_function(K val)
     // and then turns into a string due to
     // possible numeric keys
     stringstream ss;
-    char* pos;
+    char pos;
     size_t hash = 0;
     size_t tmp;
     
     ss << val;
     string auxStr = ss.str();
-    for (pos = auxStr; *pos != '\0'; ++pos){
-        hash = (hash << 4) + (*pos);
+    for (long i = 0; i < auxStr.size(); ++i){
+        pos = auxStr[0];
+        hash = (hash << 4) + pos;
         tmp = hash & 0xF0000000;
         if (tmp > 1){
             hash = hash ^ (tmp << 24);
-            hash = hash ^tmp;
+            hash = hash ^ tmp;
         }
     }
-    return hash;
+    return (hash % PRIMO);
 }
 
 // Returns a value stored in the hash map
@@ -234,17 +252,34 @@ V *HashMap<K, V>::operator[](K index)
     Node<K, V> nodeTmp;
     long posNode;
     size_t hashValue = hash_function(index);
-    long posBucket = colide(hashValue);
     V *v = nullptr;
 
     nodeTmp.key = index;
-    if (posBucket != -1) {
-        auxList = &m_buckets[posBucket].m_nodes;
+    if (m_buckets[hashValue].m_visited) {
+        auxList = &m_buckets[hashValue].m_nodes;
         posNode = binary_search(*auxList, nodeTmp);
         if (posNode != -1)
             v = &(*auxList)[posNode].value;
     }
     return v;
+}
+
+template <typename T>
+long binary_search(LSL<T> &list, T data)
+{
+    int l = 0;
+    int r = int(list.size() - 1);
+    while (l <= r)
+    {
+        int m = (l + r) / 2;
+        if (data == list[m])
+            return m;
+        else if (data < list[m])
+            r = m - 1;
+        else
+            l = m + 1;
+    }
+    return -1;
 }
 
 #endif //HASHMAP_H
